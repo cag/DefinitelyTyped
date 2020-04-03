@@ -1,6 +1,7 @@
 // Type definitions for contract-proxy-kit 1.0
 // Project: https://github.com/gnosis/contract-proxy-kit#readme
 // Definitions by: Alan Lu <https://github.com/cag>
+//                 Germán Martínez <https://github.com/germartinez>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // Minimum TypeScript Version: 3.6
 
