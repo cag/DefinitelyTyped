@@ -21,11 +21,11 @@ declare namespace CPK {
         networks?: {
             [id: string]: NetworkConfigEntry;
         };
+        ownerAccount?: string;
     }
 
     interface Web3SpecificConfig extends CommonConfig {
         web3: object;
-        ownerAccount?: string;
     }
 
     interface EthersSpecificConfig extends CommonConfig {
