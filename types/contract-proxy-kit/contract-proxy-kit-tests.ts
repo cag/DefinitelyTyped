@@ -23,42 +23,56 @@ const badEntry: CPK.NetworkConfigEntry = {
     fallbackHandlerAddress: '0xAa588d3737B611baFD7bD713445b314BD453a5C8',
 };
 
+
+// $ExpectError
+new CPK.CPKWeb3Provider();
+// $ExpectError
+new CPK.CPKWeb3Provider({});
+// $ExpectType Promise<CPK.CPKWeb3Provider>
+const web3Provider = new CPK.CPKWeb3Provider({ web3 });
+
+// $ExpectError
+new CPK.CPKEthersProvider();
+// $ExpectError
+new CPK.CPKEthersProvider({});
+// $ExpectError
+new CPK.CPKEthersProvider({ ethers });
+// $ExpectError
+new CPK.CPKEthersProvider({ signer });
+// $ExpectType Promise<CPK.CPKEthersProvider>
+const ethersProvider = new CPK.CPKEthersProvider({ ethers, signer: ethers.Wallet.createRandom() });
+
+
 // $ExpectError
 CPK.create();
 // $ExpectError
 CPK.create({});
 // $ExpectType Promise<CPK>
-CPK.create({ web3 });
+CPK.create({ cpkProvider: web3Provider });
 // $ExpectType Promise<CPK>
-CPK.create({ web3, ownerAccount: '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1' });
+CPK.create({ cpkProvider: ethersProvider });
+// $ExpectType Promise<CPK>
+CPK.create({ cpkProvider: web3Provider, ownerAccount: '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1' });
+// $ExpectType Promise<CPK>
+CPK.create({ cpkProvider: ethersProvider, ownerAccount: '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1' });
 // $ExpectError
 CPK.create({
     ownerAccount: '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1',
     networks: { 4447: networkConfigEntry },
 });
-// $ExpectError
-CPK.create({ ethers });
-// $ExpectError
-CPK.create({ signer });
-// $ExpectType Promise<CPK>
-CPK.create({ ethers, signer: ethers.Wallet.createRandom() });
 // $ExpectType Promise<CPK>
 CPK.create({
-    web3,
+    cpkProvider: web3Provider,
     networks: { 4447: networkConfigEntry },
 });
 // $ExpectType Promise<CPK>
 CPK.create({
-    ethers,
-    signer: ethers.Wallet.createRandom(),
+    cpkProvider: ethersProvider,
     networks: { 4447: networkConfigEntry },
-});
-// $ExpectType Promise<CPK>
-CPK.create({
-    cpkProvider: { foo: 'bar' }
 });
 
-CPK.create({ web3 }).then(async cpk => {
+
+CPK.create({ cpkProvider }).then(async cpk => {
     // $ExpectType CPK
     cpk;
 
@@ -107,6 +121,21 @@ CPK.create({ web3 }).then(async cpk => {
                 to: '0xffcf8fdee72ac11b5c542428b35eef5769c409f0',
                 value: `${1e18}`,
                 data: '0x',
+            },
+        ],
+        { gasPrice: `${3e9}` },
+    );
+
+    // $ExpectType TransactionResult
+    await cpk.execTransactions(
+        [
+            {
+                to: '0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1',
+                value: `${1e18}`,
+            },
+            {
+                to: '0xffcf8fdee72ac11b5c542428b35eef5769c409f0',
+                value: `${1e18}`,
             },
         ],
         { gasPrice: `${3e9}` },

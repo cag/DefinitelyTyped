@@ -7,9 +7,7 @@
 
 import { ethers } from 'ethers';
 
-export = CPK;
-
-declare namespace CPK {
+export namespace CPK {
     interface NetworkConfigEntry {
         masterCopyAddress: string;
         proxyFactoryAddress: string;
@@ -17,32 +15,33 @@ declare namespace CPK {
         fallbackHandlerAddress: string;
     }
 
-    interface CommonConfig {
+    interface Web3SpecificConfig {
+        web3: object;
+    }
+
+    interface EthersSpecificConfig {
+        ethers: typeof ethers;
+        signer: ethers.Signer;
+    }
+
+    interface CPKSpecificConfig{
+        cpkProvider: object;
+    }
+
+    type CPKProviderConfig = Web3SpecificConfig | EthersSpecificConfig | CPKSpecificConfig;
+
+    interface CPKConfig {
+        cpkProvider: CPKProviderConfig;
         networks?: {
             [id: string]: NetworkConfigEntry;
         };
         ownerAccount?: string;
     }
 
-    interface Web3SpecificConfig extends CommonConfig {
-        web3: object;
-    }
-
-    interface EthersSpecificConfig extends CommonConfig {
-        ethers: typeof ethers;
-        signer: ethers.Signer;
-    }
-
-    interface CPKSpecificConfig extends CommonConfig {
-        cpkProvider: object;
-    }
-
-    type CPKConfig = Web3SpecificConfig | EthersSpecificConfig | CPKSpecificConfig;
-
     interface Transaction {
-        operation: number | string | object;
+        operation?: number | string | object;
         to: string;
-        value: number | string | object;
+        value?: number | string | object;
         data: string;
     }
 
@@ -55,7 +54,7 @@ declare namespace CPK {
     }
 }
 
-declare class CPK {
+export class CPK {
     static CALL: 0;
     static DELEGATECALL: 1;
 
@@ -67,4 +66,45 @@ declare class CPK {
         transactions: ReadonlyArray<CPK.Transaction>,
         options?: CPK.TransactionOptions,
     ): Promise<CPK.TransactionResult>;
+}
+
+declare class CPKProvider {
+    static getContractAddress(contract: any): string;
+    static attemptTransaction(
+        contract: any,
+        viewContract: any,
+        methodName: string,
+        params: ReadonlyArray<object>,
+        sendOptions: CPK.TransactionOptions,
+        err: any
+    ): Promise<CPK.TransactionResult>;
+    static getSendOptions(options: CPK.TransactionOptions, ownerAccount?: string): object;
+    
+    init(
+        isConnectedToSafe: boolean,
+        ownerAccount: string,
+        masterCopyAddress: string,
+        proxyFactoryAddress: string,
+        multiSendAddress: string
+    ): object;
+    getProvider(): any;
+    getNetworkId(): Promise<number>;
+    getOwnerAccount(): Promise<string>;
+    getCodeAtAddress(contract: any): Promise<string>;
+    getContract(abi: ReadonlyArray<object>, address: string): any;
+    checkSingleCall(tx: CPK.Transaction): Promise<any>;
+    attemptSafeProviderSendTx(
+        tx: CPK.Transaction,
+        options: CPK.TransactionOptions
+    ): Promise<object>;
+    attemptSafeProviderMultiSendTxs(transactions: ReadonlyArray<CPK.Transaction>): object;
+    encodeMultiSendCallData(transactions: ReadonlyArray<CPK.Transaction>): string;
+}
+
+export class CPKWeb3Provider extends CPKProvider {
+    constructor(opts: CPK.Web3SpecificConfig);
+}
+
+export class CPKEthersProvider extends CPKProvider {
+    constructor(opts: CPK.EthersSpecificConfig);
 }
