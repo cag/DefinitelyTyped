@@ -99,6 +99,9 @@ declare class CPKProvider {
     ): Promise<object>;
     attemptSafeProviderMultiSendTxs(transactions: ReadonlyArray<CPK.Transaction>): object;
     encodeMultiSendCallData(transactions: ReadonlyArray<CPK.Transaction>): string;
+    encodeAttemptTransaction(contractAbi: ReadonlyArray<object>, methodName: string, params: ReadonlyArray<object>): string;
+    getGasPrice(): Promise<number>;
+    getSafeNonce(safeAddress: string): Promise<number>;
 }
 
 export class CPKWeb3Provider extends CPKProvider {
